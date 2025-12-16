@@ -20,7 +20,6 @@ canvas.addEventListener("touchend", stopDrawing);
 canvas.addEventListener("touchmove", draw);
 
 function startDrawing(event) {
-  console.log("vaoday");
   event.preventDefault();
   const { x, y } = getPosition(event);
 
@@ -186,6 +185,27 @@ function previewSignature(sizePercent) {
   signatureImage.ondragstart = () => false;
 }
 
+function getName() {
+  var urlString = window.location.href;
+  var url = new URL(urlString);
+  var nameValue = url.searchParams.get("n");
+  const newName = String(nameValue);
+
+  let setName = name;
+  if (nameValue !== null) {
+    let str = decodeURIComponent(newName);
+    if (str.includes("%20")) {
+      let str = str.replace(/%20/g, " ");
+      setName = str;
+    } else {
+      setName = str;
+    }
+  } else {
+    setName = name;
+  }
+  return setName;
+}
+
 function saveSignature(userId, userCard, scale) {
   const confirmSave = confirm("Bạn có chắc chắn muốn ký và lưu không?");
   if (!confirmSave) return;
@@ -226,19 +246,19 @@ function saveSignature(userId, userCard, scale) {
 
   const signatureData = exportCanvas.toDataURL("image/png");
 
-  const GOOGLE_SCRIPT_URL_THAM_DU =
-    "https://script.google.com/macros/s/AKfycbwqI2rDyiHiFPCzS2xYz99a-QnrPA_im_fnuMvCmUhwrP0IpG9eyaqVOgpeG94Db3f8Sw/exec";
+  const GOOGLE_SCRIPT_URL_CHU_KY =
+    "https://script.google.com/macros/s/AKfycbxFPAaXYPN9F0kJte6evANiXV5jpSCTlceN9dkgPD_BMLs--FoE7veJBwxsSOvqYGse/exec";
 
   const data = {
     signature: signatureData,
     idUser: generateId(),
-    userCard: userCard,
+    userCard: getName() || userCard,
     x: posX,
     y: posY,
     formType: "ChuKy",
   };
 
-  fetch(GOOGLE_SCRIPT_URL_THAM_DU, {
+  fetch(GOOGLE_SCRIPT_URL_CHU_KY, {
     method: "POST",
     body: JSON.stringify(data),
     headers: {
